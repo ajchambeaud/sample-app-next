@@ -1,0 +1,15 @@
+# Development override: hot reload with the source mounted into the container.
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+services:
+  web:
+    build:
+      target: dev
+    volumes:
+      - ./web:/app
+      - web_node_modules:/app/node_modules
+      - web_next:/app/.next
+      - ./data/sqlite:/app/data
+
+volumes:
+  web_node_modules:
+  web_next:

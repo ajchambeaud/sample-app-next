@@ -1,0 +1,59 @@
+services:
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      # The browser PUTs/GETs covers directly with presigned URLs, so MinIO must
+      # allow the app's origin.
+      MINIO_API_CORS_ALLOW_ORIGIN: ${MINIO_API_CORS_ALLOW_ORIGIN:-http://localhost:4900}
+    ports:
+      - "4902:9000"
+      - "4903:9001"
+    volumes:
+      - ./data/minio:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-shot init: creates the covers bucket if missing.
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 minioadmin minioadmin &&
+      mc mb --ignore-existing local/covers &&
+      echo 'MinIO init complete';
+      "
+
+  web:
+    build:
+      context: ./web
+      target: runner
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: file:/app/data/library.sqlite
+      SESSION_SECRET: ${SESSION_SECRET:-dev-secret-change-me}
+      SESSION_COOKIE_SECURE: "false"
+      # Internal endpoint for server-side calls; public one is baked into the
+      # presigned URLs the browser receives.
+      S3_ENDPOINT: http://minio:9000
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:4902}
+      S3_REGION: us-east-1
+      S3_BUCKET: covers
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      PRESIGN_PUT_TTL: 300
+      PRESIGN_GET_TTL: 600
+    ports:
+      - "4900:3000"
+    volumes:
+      - ./data/sqlite:/app/data
