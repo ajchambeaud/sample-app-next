@@ -6,7 +6,7 @@ out/
 .env.*.local
 
 # Local data volumes for docker compose (SQLite file + MinIO objects)
-data/
+/data/
 
 # Editor / OS
 .DS_Store
