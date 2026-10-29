@@ -43,6 +43,9 @@ services:
       DATABASE_URL: file:/app/data/library.sqlite
       SESSION_SECRET: ${SESSION_SECRET:-dev-secret-change-me}
       SESSION_COOKIE_SECURE: "false"
+      # Faustine identity verification secret; set it in a root .env (gitignored).
+      FAUSTINE_IDENTITY_SECRET: ${FAUSTINE_IDENTITY_SECRET:-}
+      FAUSTINE_DEBUG: ${FAUSTINE_DEBUG:-false}
       # Internal endpoint for server-side calls; public one is baked into the
       # presigned URLs the browser receives.
       S3_ENDPOINT: http://minio:9000

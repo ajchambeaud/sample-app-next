@@ -14,6 +14,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1152.0",
     "@aws-sdk/s3-request-presigner": "^3.1152.0",
+    "@faustine-ai/next": "^0.1.5",
+    "@faustine-ai/web-agent": "^0.2.5",
     "@libsql/client": "^0.18.0",
     "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.4",

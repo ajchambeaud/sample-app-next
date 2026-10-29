@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withFaustine } from "@faustine-ai/next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -16,4 +17,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Exposes the build commit to the Faustine handler so the portal shows which commit runs.
+export default withFaustine(nextConfig);
